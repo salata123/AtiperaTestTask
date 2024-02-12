@@ -1,5 +1,6 @@
 package com.Atipera.MichalLisekTestTask;
 
+import com.Atipera.MichalLisekTestTask.services.RequestSender;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;

@@ -1,5 +1,6 @@
 package com.Atipera.MichalLisekTestTask;
 
+import com.Atipera.MichalLisekTestTask.services.RequestSender;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
