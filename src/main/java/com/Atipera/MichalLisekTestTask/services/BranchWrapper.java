@@ -3,6 +3,8 @@ package com.Atipera.MichalLisekTestTask.services;
 import com.Atipera.MichalLisekTestTask.github.Branch;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class BranchWrapper {
     public List<Branch> createList (HttpURLConnection connectionBranches) throws IOException {
         List<Branch> branchList = new ArrayList<>();

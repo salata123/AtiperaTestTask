@@ -21,15 +21,19 @@ public class MichalLisekTestTaskApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		Scanner scanner = new Scanner(System.in);
-		String username = "";
+		try (Scanner scanner = new Scanner(System.in)) {
+			String username = "";
 
-		while (!username.equals("exit")){
-			System.out.println("Please provide an username to search their repositories or type 'exit' to close the app:");
-			username = scanner.nextLine();
-			if(!username.equals("exit")){
-				requestSender.send(username);
+			while (!username.equals("exit")) {
+				System.out.print("Please provide a username to search users' repositories or type 'exit' to close the app: ");
+				username = scanner.nextLine();
+
+				if (!username.equals("exit")) {
+					requestSender.send(username);
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

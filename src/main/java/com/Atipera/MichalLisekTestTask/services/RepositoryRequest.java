@@ -3,14 +3,20 @@ package com.Atipera.MichalLisekTestTask.services;
 import com.Atipera.MichalLisekTestTask.exception.ErrorReader;
 import com.Atipera.MichalLisekTestTask.exception.ExceptionHandlerRepository;
 import com.Atipera.MichalLisekTestTask.github.Repository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-@Component
+@Service
 public class RepositoryRequest {
-    private RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
+    private RepositoryWrapper repositoryWrapper;
+    private ConnectionCreator connectionCreator;
+    public RepositoryRequest(RepositoryWrapper repositoryWrapper, ConnectionCreator connectionCreator){
+        this.repositoryWrapper = repositoryWrapper;
+        this.connectionCreator = connectionCreator;
+    }
     private ErrorReader errorReader = new ErrorReader();
 
     public List<Repository> send(String username, String githubApiToken){
@@ -20,13 +26,7 @@ public class RepositoryRequest {
             String githubRepositoriesUrl = "https://api.github.com/users/" + username + "/repos";
             URL urlRepositories = new URL(githubRepositoriesUrl);
 
-            HttpURLConnection connectionRepositories = (HttpURLConnection) urlRepositories.openConnection();
-
-            connectionRepositories.setRequestMethod("GET");
-
-            connectionRepositories.setRequestProperty("Accept", "application/vnd.github+json");
-            connectionRepositories.setRequestProperty("Authorization", "Bearer " + githubApiToken);
-            connectionRepositories.setRequestProperty("X-GitHub-Api-Version", "2022-11-28");
+            HttpURLConnection connectionRepositories = connectionCreator.create(urlRepositories, githubApiToken);
 
             int responseCodeRepositories = connectionRepositories.getResponseCode();
 

@@ -4,6 +4,8 @@ import com.Atipera.MichalLisekTestTask.github.Branch;
 import com.Atipera.MichalLisekTestTask.github.Repository;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,8 +13,13 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class RepositoryWrapper {
-    private BranchRequest branchRequest = new BranchRequest();
+    private BranchRequest branchRequest;
+
+    public RepositoryWrapper(BranchRequest branchRequest){
+        this.branchRequest = branchRequest;
+    }
 
     public List<Repository> createList (String username, String githubApiToken, HttpURLConnection connectionRepositories) throws IOException {
         List<Repository> repositories = new ArrayList<>();
