@@ -1,25 +1,23 @@
 package com.Atipera.MichalLisekTestTask.services;
 
-import com.Atipera.MichalLisekTestTask.exception.ErrorReader;
 import com.Atipera.MichalLisekTestTask.exception.ExceptionHandlerRepository;
 import com.Atipera.MichalLisekTestTask.github.Repository;
-import org.springframework.stereotype.Service;
-
+import org.springframework.stereotype.Component;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-@Service
+@Component
 public class RepositoryRequest {
     private RepositoryWrapper repositoryWrapper;
     private ConnectionCreator connectionCreator;
+
     public RepositoryRequest(RepositoryWrapper repositoryWrapper, ConnectionCreator connectionCreator){
         this.repositoryWrapper = repositoryWrapper;
         this.connectionCreator = connectionCreator;
     }
-    private ErrorReader errorReader = new ErrorReader();
 
-    public List<Repository> send(String username, String githubApiToken){
+    public List<Repository> send(String username, String githubApiToken) throws ExceptionHandlerRepository{
         List<Repository> repositories;
 
         try {
@@ -36,8 +34,7 @@ public class RepositoryRequest {
                 return repositories;
 
             } else {
-                String message = errorReader.read(connectionRepositories);
-                throw ExceptionHandlerRepository.handleError(responseCodeRepositories, message);
+                throw new ExceptionHandlerRepository(connectionRepositories);
             }
         } catch (Exception e){
             e.printStackTrace();

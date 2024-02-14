@@ -1,10 +1,11 @@
 package com.Atipera.MichalLisekTestTask.services;
 
+import com.Atipera.MichalLisekTestTask.exception.ExceptionHandlerRepository;
 import com.Atipera.MichalLisekTestTask.github.Repository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -16,7 +17,7 @@ public class RequestSender {
         this.repositoryRequest = repositoryRequest;
     }
 
-    public List<Repository> send(String username){
+    public List<Repository> send(String username) throws ExceptionHandlerRepository, IOException {
         List<Repository> repositories = repositoryRequest.send(username, githubApiToken);
         return repositories;
     }

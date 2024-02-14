@@ -8,20 +8,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class BranchWrapperTestSuite {
+public class RepositoryWrapperTestSuite {
+    @Mock
+    private BranchRequest branchRequest;
     @Mock
     private HttpURLConnection mockConnection;
     @InjectMocks
-    private BranchWrapper branchWrapper;
+    private RepositoryWrapper repositoryWrapper;
+    private String mockGithubApiToken;
     private List<Branch> mockBranches;
     private String mockBranchName;
     private String mockBranchCommitSha;
@@ -35,6 +40,8 @@ public class BranchWrapperTestSuite {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+
+        mockGithubApiToken = "mockGithubApiToken";
 
         mockBranches = new ArrayList<>();
         mockBranchName = "mockBranchName";
@@ -53,18 +60,23 @@ public class BranchWrapperTestSuite {
     @Test
     void repositoryRequestTest() throws IOException {
         //Given
-        String responseMock = "[{\"name\":\"" + mockBranchName + "\",\"commit\":{\"sha\":\"" + mockBranchCommitSha + "\"}}]";
+        String responseMock = "[{\"id\": " + mockRepositoryId + ", \"name\": \"" + mockRepositoryName +
+                "\", \"owner\": {\"login\": \"" + mockRepositoryOwnerLogin + "\"}, \"fork\": false}]";
 
         byte[] mockResponseBytes = responseMock.getBytes();
+        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(mockResponseBytes));
 
         // When
-        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(mockResponseBytes));
-        List<Branch> result = branchWrapper.createList(mockConnection);
+        when(branchRequest.send(anyString(), anyString(), anyString())).thenReturn(mockBranches);
+        List<Repository> result = repositoryWrapper.createList(mockRepositoryOwnerLogin, mockGithubApiToken, mockConnection);
 
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(mockBranchName, result.get(0).getName());
-        assertEquals(mockBranchCommitSha, result.get(0).getCommitSha());
+        Repository repository = result.get(0);
+        assertEquals(mockRepositoryId, repository.getId());
+        assertEquals(mockRepositoryName, repository.getName());
+        assertEquals(mockRepositoryOwnerLogin, repository.getOwnerLogin());
+        assertEquals(mockRepositories, result);
     }
 }

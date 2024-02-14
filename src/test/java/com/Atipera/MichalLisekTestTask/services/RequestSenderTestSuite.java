@@ -1,5 +1,6 @@
 package com.Atipera.MichalLisekTestTask.services;
 
+import com.Atipera.MichalLisekTestTask.exception.ExceptionHandlerRepository;
 import com.Atipera.MichalLisekTestTask.github.Branch;
 import com.Atipera.MichalLisekTestTask.github.Repository;
 import org.junit.jupiter.api.Assertions;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +52,7 @@ public class RequestSenderTestSuite {
     }
 
     @Test
-    void requestSenderTest() {
+    void requestSenderTest() throws ExceptionHandlerRepository {
         //When
         when(repositoryRequest.send(mockRepositoryName, mockGithubApiToken)).thenReturn(mockRepositories);
 
