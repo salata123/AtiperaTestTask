@@ -3,14 +3,15 @@ package com.Atipera.MichalLisekTestTask.services;
 import com.Atipera.MichalLisekTestTask.github.Branch;
 import org.springframework.stereotype.Service;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class BranchRequest {
-    private BranchWrapper branchWrapper;
-    private ConnectionCreator connectionCreator;
+    private final BranchWrapper branchWrapper;
+    private final ConnectionCreator connectionCreator;
 
     public BranchRequest(BranchWrapper branchWrapper, ConnectionCreator connectionCreator){
         this.branchWrapper = branchWrapper;
@@ -22,7 +23,8 @@ public class BranchRequest {
 
         try{
             String githubBranchesUrl = "https://api.github.com/repos/" + username + "/" + name + "/branches";
-            URL urlBranches = new URL(githubBranchesUrl);
+            URI uriBranches = new URI(githubBranchesUrl);
+            URL urlBranches = uriBranches.toURL();
 
             HttpURLConnection connectionBranches = connectionCreator.create(urlBranches, githubApiToken);
 

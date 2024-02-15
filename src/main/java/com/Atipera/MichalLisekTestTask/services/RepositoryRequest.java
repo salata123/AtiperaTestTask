@@ -4,13 +4,14 @@ import com.Atipera.MichalLisekTestTask.exception.ExceptionHandlerRepository;
 import com.Atipera.MichalLisekTestTask.github.Repository;
 import org.springframework.stereotype.Component;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
 @Component
 public class RepositoryRequest {
-    private RepositoryWrapper repositoryWrapper;
-    private ConnectionCreator connectionCreator;
+    private final RepositoryWrapper repositoryWrapper;
+    private final ConnectionCreator connectionCreator;
 
     public RepositoryRequest(RepositoryWrapper repositoryWrapper, ConnectionCreator connectionCreator){
         this.repositoryWrapper = repositoryWrapper;
@@ -22,7 +23,8 @@ public class RepositoryRequest {
 
         try {
             String githubRepositoriesUrl = "https://api.github.com/users/" + username + "/repos";
-            URL urlRepositories = new URL(githubRepositoriesUrl);
+            URI uriRepositories = new URI(githubRepositoriesUrl);
+            URL urlRepositories = uriRepositories.toURL();
 
             HttpURLConnection connectionRepositories = connectionCreator.create(urlRepositories, githubApiToken);
 

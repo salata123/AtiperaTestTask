@@ -5,34 +5,25 @@ import com.Atipera.MichalLisekTestTask.github.Repository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class RepositoryWrapper {
-    private BranchRequest branchRequest;
+    private final BranchRequest branchRequest;
+    private final ResponseReader responseReader;
 
-    public RepositoryWrapper(BranchRequest branchRequest){
+    public RepositoryWrapper(BranchRequest branchRequest, ResponseReader responseReader){
         this.branchRequest = branchRequest;
+        this.responseReader = responseReader;
     }
 
     public List<Repository> createList (String username, String githubApiToken, HttpURLConnection connectionRepositories) throws IOException {
         List<Repository> repositories = new ArrayList<>();
+        JSONArray jsonArray = responseReader.toJson(connectionRepositories);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connectionRepositories.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        while ((inputLine = reader.readLine()) != null){
-            response.append(inputLine);
-        }
-        reader.close();
-
-        JSONArray jsonArray = new JSONArray(response.toString());
         for(int i = 0; i < jsonArray.length(); i++){
             JSONObject repositoryObject = jsonArray.getJSONObject(i);
             if(!repositoryObject.getBoolean("fork")){

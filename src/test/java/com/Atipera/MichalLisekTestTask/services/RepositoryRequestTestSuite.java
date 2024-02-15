@@ -11,9 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import static org.mockito.Mockito.mock;
@@ -42,8 +40,11 @@ public class RepositoryRequestTestSuite {
     private URL mockUrl;
 
     @BeforeEach
-    void setup() throws MalformedURLException {
+    void setup() throws MalformedURLException, URISyntaxException {
         MockitoAnnotations.openMocks(this);
+
+        repositoryWrapper = mock(RepositoryWrapper.class);
+        repositoryRequest = new RepositoryRequest(repositoryWrapper, connectionCreator);
 
         mockGithubApiToken = "mockGithubApiToken";
 
@@ -63,7 +64,8 @@ public class RepositoryRequestTestSuite {
         githubRepositoriesUrl = "https://api.github.com/users/" + mockRepositoryOwnerLogin + "/repos";
 
         mockConnection = mock(HttpURLConnection.class);
-        mockUrl = new URL(githubRepositoriesUrl);
+        URI mockUri = new URI(githubRepositoriesUrl);
+        mockUrl = mockUri.toURL();
     }
 
     @Test

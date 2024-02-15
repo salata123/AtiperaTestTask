@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 public class RepositoryWrapperTestSuite {
     @Mock
     private BranchRequest branchRequest;
+    @Mock
+    private ResponseReader responseReader;
     @Mock
     private HttpURLConnection mockConnection;
     @InjectMocks
@@ -41,6 +43,9 @@ public class RepositoryWrapperTestSuite {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
+        responseReader = new ResponseReader();
+        repositoryWrapper = new RepositoryWrapper(branchRequest, responseReader);
+
         mockGithubApiToken = "mockGithubApiToken";
 
         mockBranches = new ArrayList<>();
@@ -49,11 +54,11 @@ public class RepositoryWrapperTestSuite {
         mockBranch = new Branch(mockBranchName, mockBranchCommitSha);
         mockBranches.add(mockBranch);
 
+        mockRepositories = new ArrayList<>();
         mockRepositoryId = 123;
         mockRepositoryName = "mockRepositoryName";
         mockRepositoryOwnerLogin = "mockRepositoryOwnerLogin";
         mockRepository = new Repository(mockRepositoryId, mockRepositoryName, mockRepositoryOwnerLogin, mockBranches);
-        mockRepositories = new ArrayList<>();
         mockRepositories.add(mockRepository);
     }
 
@@ -63,12 +68,19 @@ public class RepositoryWrapperTestSuite {
         String responseMock = "[{\"id\": " + mockRepositoryId + ", \"name\": \"" + mockRepositoryName +
                 "\", \"owner\": {\"login\": \"" + mockRepositoryOwnerLogin + "\"}, \"fork\": false}]";
 
+        String responseMockForked = "[{\"id\": " + mockRepositoryId + ", \"name\": \"" + mockRepositoryName +
+                "\", \"owner\": {\"login\": \"" + mockRepositoryOwnerLogin + "\"}, \"fork\": true}]";
+
+        //When
         byte[] mockResponseBytes = responseMock.getBytes();
         when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(mockResponseBytes));
 
-        // When
         when(branchRequest.send(anyString(), anyString(), anyString())).thenReturn(mockBranches);
         List<Repository> result = repositoryWrapper.createList(mockRepositoryOwnerLogin, mockGithubApiToken, mockConnection);
+
+        byte[] mockResponseBytesForked = responseMockForked.getBytes();
+        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(mockResponseBytesForked));
+        List<Repository> resultForked = repositoryWrapper.createList(mockRepositoryOwnerLogin, mockGithubApiToken, mockConnection);
 
         // Then
         assertNotNull(result);
@@ -78,5 +90,8 @@ public class RepositoryWrapperTestSuite {
         assertEquals(mockRepositoryName, repository.getName());
         assertEquals(mockRepositoryOwnerLogin, repository.getOwnerLogin());
         assertEquals(mockRepositories, result);
+
+        assertNotNull(resultForked);
+        assertEquals(0, resultForked.size());
     }
 }

@@ -10,6 +10,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,9 @@ public class BranchRequestTestSuite {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
+        branchWrapper = mock(BranchWrapper.class);
+        branchRequest = new BranchRequest(branchWrapper, connectionCreator);
+
         mockGithubApiToken = "mockGithubApiToken";
 
         mockBranches = new ArrayList<>();
@@ -52,18 +57,19 @@ public class BranchRequestTestSuite {
     }
 
     @Test
-    void repositoryRequestTest() throws IOException {
+    void repositoryRequestTest() throws IOException, URISyntaxException {
         //Given
         HttpURLConnection mockConnection = mock(HttpURLConnection.class);
-        URL mockUrl = new URL(githubRepositoriesUrl);
+        URI mockUri = new URI(githubRepositoriesUrl);
+        URL mockUrl = mockUri.toURL();
 
         //When
         when(connectionCreator.create(mockUrl, mockGithubApiToken)).thenReturn(mockConnection);
         when(mockConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
-        when(branchWrapper.createList(connectionCreator.create(mockUrl, mockGithubApiToken))).thenReturn(mockBranches);
+        when(branchWrapper.createList(mockConnection)).thenReturn(mockBranches);
 
         //Then
         List<Branch> returnedBranchList = branchRequest.send(mockRepositoryOwnerLogin, mockRepositoryName, mockGithubApiToken);
-        Assertions.assertEquals(returnedBranchList, mockBranches);
+        Assertions.assertEquals(mockBranches, returnedBranchList);
     }
 }
